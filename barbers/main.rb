@@ -12,7 +12,7 @@ number_of_test_cases.to_i.times do |test_case_number|
   test_case_input = test_cases.take(2)
   test_cases = test_cases - test_case_input
 
-  customer_number = test_case_input[0].split.last
+  customer_number = test_case_input[0].split.last.to_i
   barber_times = test_case_input[1].split.map { |entry| entry.to_i }
 
   output = Scheduler
