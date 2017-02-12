@@ -5,34 +5,47 @@ class Scheduler
       @barber_times = barber_times
     end
 
-    def find_barber(n)
-        if n <= barber_times.count
-            n
+    def find_barber(customer_number:)
+        if customer_number <= barber_times.count
+            customer_number
         else
-            calculate_barber(n)
+            calculate_barber(customer_number)
         end
     end
 
     private
 
-    def calculate_barber(n)
-        done = false
+    def calculate_barber(customer_number)
+        next_customer = barber_times.count + 1
+        current_barber_times = barber_times.clone
         selected_barber = nil
 
-        next_customer = n - barber_times.count
-        current_barber_times = barber_times
+        while next_customer <= customer_number
+            available_barbers = calculate_available_barbers(current_barber_times)
 
-        while next_customer > 0
-            next_barber_index = current_barber_times.find_index { |barber_time| barber_time == 0 }
+            available_barbers.each do |current_barber|
+                if next_customer == customer_number
+                    selected_barber = current_barber
+                end
 
-            if next_barber_index.nil?
-                current_barber_times.map! { |barber_time| barber_time -= 1 }
-            else
-                next_customer -= 1
-                current_barber_times[next_barber_index] = barber_times[next_barber_index]
+                next_customer += 1
+
+                current_barber_times[current_barber] = barber_times[current_barber]
             end
+
+            current_barber_times.map! { |barber_time| barber_time -= 1 }
         end
 
-        next_barber_index + 1
+        selected_barber + 1
+    end
+
+    def calculate_available_barbers(current_barber_times)
+        result = []
+
+        current_barber_times.each_with_index do |barber_time, index|
+            result << index if barber_time == 0
+        end
+
+        result
     end
 end
