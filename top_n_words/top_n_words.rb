@@ -1,32 +1,29 @@
-def extract_words(sentence)
-  delimiters = /[\s,',,?]/
-  sentence.split(delimiters)
+def top_n_words(sentence, n_words)
+  words = parse(sentence)
+  frequency_map = build_freq_map(words)
+  pick_top_n(frequency_map, n_words)
 end
 
-def frequency_map(sentence)
-  result = {}
-  
-  extract_words(sentence).each do |word|
-    word = word.downcase
-
-    if result.key?(word)
-      result[word] += 1
-    else
-      result[word] = 1
-    end
-  end
-  
-  result
+def parse(sentence)
+  delimiters = /[.,?!':]/
+  words = sentence.gsub(delimiters, "").split
+  words.each { |word| word.downcase! }
 end
 
-def top_n_words(sentence, n:)      
-  frequency_map(sentence)
-    .sort_by { |k, v| v }
-    .reverse!
-    .map { |k, v| k }
-    .take(n)
+def build_freq_map(words)
+  # TODO: How does the += work on nil
+  words.inject(Hash.new(0)) { |output, word| output[word] += 1; output }
 end
 
-input = "The game of life is like the Game of thrones"
+def pick_top_n(freq_map, n_words)
+  freq_map
+    .sort_by { |key, value| value }
+    .reverse
+    .to_h
+    .keys
+    .take(n_words)
+end
 
-top_n_words(input, n: 3).each { |item| puts item }
+str = "Two vast and trunkless legs of stone Stand in the desert. Near them, on the sand, Half sunk, a shattered visage lies, whose frown, And wrinkled lip, and sneer of cold command, Tell that its sculptor well those passions read Which yet survive, stamped on these lifeless things, The hand that mocked them and the heart that fed: And on the pedestal these words appear: 'My name is Ozymandias, king of kings: Look on my works, ye Mighty, and despair!' Nothing beside remains. Round the decay Of that colossal wreck, boundless and bare The lone and level sands stretch far away."
+
+puts top_n_words(str,10)
