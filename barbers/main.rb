@@ -1,8 +1,9 @@
 load 'scheduler.rb'
+require 'pry'
 
 input_lines = File
   .readlines("input.txt")
-  .map { |line| line.gsub(/\n/, "") } 
+  .map { |line| line.gsub(/\n/, "") }
 
 number_of_test_cases = input_lines.first
 
