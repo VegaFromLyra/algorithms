@@ -6,28 +6,29 @@ class Scheduler
   end
 
   def find_barber(customer_number:)
-    remaining_times = barber_times.clone
-    customers = (1..barber_times.count).to_a
-
-    next_customer = barber_times.count + 1
-
-    barber = nil
+    current_time = 0
+    latest_customer = barber_times.count
 
     loop do
-      barber = customers.find_index { |customer| customer == customer_number }
-      break unless barber.nil?
+      current_time += skip_ahead(barber_times)
 
-      remaining_times.map! { |remaining| remaining -= 1 }
+      barber_times.each_with_index do |barber_time, index|
+        if current_time % barber_time == 0
+          latest_customer += 1
 
-      remaining_times.each_with_index do |remaining, index|
-        if remaining == 0
-          remaining_times[index] = barber_times[index]
-          customers[index] = next_customer
-          next_customer += 1
+          if latest_customer == customer_number
+            return index + 1
+          end
         end
       end
     end
+  end
 
-    barber + 1
+  def skip_ahead(collection)
+    result = collection.sort.find do |number|
+      collection.all? { |item| item % number == 0 }
+    end
+
+    result || 1
   end
 end
