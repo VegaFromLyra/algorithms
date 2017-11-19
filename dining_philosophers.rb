@@ -1,4 +1,5 @@
 require "thread"
+require "pry"
 
 class Philosopher
   attr_reader :id
@@ -12,7 +13,7 @@ class Philosopher
   end
 
   def done
-    puts "mamma mia!"
+    puts "Philosopher #{id} is done! Mamma mia!"
   end
 
   def think
@@ -32,57 +33,56 @@ class Fork
   end
 end
 
-p1 = Philosopher.new(1)
-p2 = Philosopher.new(2)
-p3 = Philosopher.new(3)
-p4 = Philosopher.new(4)
-p5 = Philosopher.new(5)
+def process(n)
+  philosophers = []
+  forks = []
 
-f1 = Fork.new(1)
-f2 = Fork.new(2)
-f3 = Fork.new(3)
-f4 = Fork.new(4)
-f5 = Fork.new(5)
+  n.times do |counter|
+    philosophers << Philosopher.new(counter + 1)
+    forks << Fork.new(counter + 1)
+  end
 
-arrangement = {
-  p1: [f1, f2],
-  p2: [f2, f3],
-  p3: [f3, f4],
-  p4: [f4, f5],
-  p5: [f5, f1]
-}
+  arrangement = arrange(philosophers, forks)
 
-semaphore = Mutex.new
-resource = ConditionVariable.new
+  mutex = Mutex.new
+  resource = ConditionVariable.new
 
-t1 = Thread.new {
-  loop do
-    p1.eat
-    semaphore.synchronize {
-      resource.wait(semaphore)
-      f1.in_use!
-      f2.in_use!
-      sleep(3)
+  t1 = Thread.new {
+    mutex.synchronize {
+      resource.wait(mutex)
+      puts "p1 is eating"
+      forks[0].in_use!
+      forks[1].in_use!
+      philosophers[0].eat
+      sleep(1)
+    }
+    philosophers[0].done
+    philosophers[0].think
+  }
+
+  t2 = Thread.new {
+    mutex.synchronize {
+      forks[1].in_use!
+      forks[2].in_use!
+      philosophers[1].eat
+      sleep(1)
       resource.signal
     }
-    p1.done
-    p1.think
-  end
-}
+    philosophers[1].done
+    philosophers[1].think
+  }
 
-t2 = Thread.new {
-  loop do
-    p2.eat
-    semaphore.synchronize {
-      resource.wait(semaphore)
-      f2.in_use!
-      f3.in_use!
-      sleep(5)
-      resource.signal
-    }
-    p2.done
-    p2.think
-  end
-}
+  t1.join
+  t2.join
+end
 
-t2.join
+def arrange(philosophers, forks)
+  counter = 0
+  philosophers.inject({}) do |memo, p|
+    memo[p] = [forks[counter], forks[(counter + 1) % forks.count]]
+    counter += 1
+    memo
+  end
+end
+
+process(5)
