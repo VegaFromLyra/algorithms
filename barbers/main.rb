@@ -1,3 +1,5 @@
+# https://code.google.com/codejam/contest/4224486/dashboard#s=p1
+
 load 'scheduler.rb'
 require 'pry'
 
