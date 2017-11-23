@@ -44,7 +44,7 @@ end
 
 class Game
   def initialize(n)
-    @board = Array.new(n) { Array.new(n, Cell.new) }
+    @board = Array.new(n) { Array.new(n) { Cell.new } }
     @current_row = n / 2
     @current_column = n / 2
     @ant = Ant.new
