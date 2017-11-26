@@ -1,5 +1,3 @@
-require "pry"
-
 module Color
   WHITE = false
   BLACK = true
