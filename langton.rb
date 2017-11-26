@@ -29,7 +29,7 @@ class Ant
 end
 
 class Cell
-  attr_accessor :color, :ant
+  attr_accessor :color
 
   def initialize(color: Color::WHITE)
     @color = color
