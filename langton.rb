@@ -87,21 +87,23 @@ class Game
 
     current_cell.toggle_color!
 
-    case ant.direction
-    when Ant::Direction::NORTH
-      @current_row -= 1
-    when Ant::Direction::EAST
-      @current_column += 1
-    when Ant::Direction::SOUTH
-      @current_row += 1
-    when Ant::Direction::WEST
-      @current_column -= 1
-    end
+    next_step = direction_map[ant.direction]
+    @current_row += next_step[0]
+    @current_column += next_step[1]
   end
 
   private
 
   attr_reader :board, :ant
+
+  def direction_map
+    {
+      Ant::Direction::NORTH => [-1, 0],
+      Ant::Direction::EAST => [0, 1],
+      Ant::Direction::SOUTH => [1, 0],
+      Ant::Direction::WEST => [0, -1]
+    }
+  end
 end
 
-Game.new(3).play(turns: 5)
+Game.new(ARGV[0].to_i).play(turns: ARGV[1].to_i)
