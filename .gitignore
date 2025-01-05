@@ -1,3 +1,5 @@
 # No temp VIM files
 *.swp
 *.swo
+/bfs/.idea/
+/bfs/target/
